@@ -1,0 +1,105 @@
+=================================
+Genesis Simulation of GnRH cells
+
+Author: Carson B. Roberts
+Emory University
+2004-2005
+University of Texas at San Antonio
+2005-2008
+email: carson.b.roberts@gmail.com
+
+==================================
+
+This archive consists of a number of files that work together to generate simulated voltage
+responses from model Gonadotropin-Releasing Hormone cells.  There is a single-compartment 
+version of the model, and a multi-compartment model, based on actual reconstructed
+cell morphology.
+
+As written, the simulations require Genesis to be installed on the host computer.
+
+Genesis can be obtained and simply installed from:
+
+                   http://www.genesis-sim.org/GENESIS/
+                             
+===============================================================================
+                 Single and Multi-Compartment Models
+===============================================================================
+As delivered, this package contains both single-comaprtment and multi-compartment 
+Genesis models. 
+ To look at a 448 compartment model with realistic morphology, an active
+soma and axon and passive dendrites, invoke GENESIS at the command line with:
+>  genesis gnrh_runcell_GABA
+
+To run a single-compartment version of the same model, invoke GENESIS with:
+>  genesis gnrh_runcell_GABA_singlecomp
+
+================================================================================
+                 Current Injections and Phase Plane Analysis
+================================================================================
+
+As delivered, the scripts are set up to perform a series of current injections, first to 
+generate a single spike, and then to do a gradual increase in injected current, to generate 
+a sort of phase-plane diagram.  The current injections are all set up in the script:
+                      gnrh_current_inject
+This script can be edited to change the types of current injections being performed. 
+Existing lines can be uncommented (remove the "//" from the beginning of each line).  Many
+lines have comments indicating the type of behavior expected from the injections.
+
+The two loops at the end can be modified to change the rates of increase of current, or just
+eliminated by changing the "<" in the "while" loops to ">".
+
+=================================================================================
+                 Simulated Synaptic Inputs
+=================================================================================
+The main Genesis script that runs the simulation is:
+                     gnrh_runcell_GABA_singlecomp.g 
+                                or
+                     gnrh_runcell_GABA.g   (for the full-morphology model)      
+
+Near the end of that script (~ line 354), after everything is set up, there are two blocks of code,
+with comments and a single executable line.  To do the current injections, (as delivered)
+leave uncommented the line:
+                      do_current_injections
+To look at effects of synaptic inputs, comment this line out, (add a "//" at the start of 
+the line) and uncomment the preceeding executable line:
+                       // step {run_time} -time
+(remove the "//")
+
+This will then cause the simulation to run for a time (run_time) set in the script:
+                        gnrh_const_singlecomp.g
+                              or
+                        gnrh_const.g (for the full-morphology model)
+It is in this script that the densities of the various channels, and the strength, number 
+and frequency of AMPA and GABA synapses can be varied.  Look around line 126 for parameters
+for GABA synapses, and around line 139 for parameters for GABA synapses.  
+
+Once values for numbers of AMPA and GABA synapses have been set, set the "run_time" variable 
+(around line 117) to an appropriate value in seconds (the default is 0.5 sec.)
+
+==============================================================================================
+                  Voltage-gated  Channel Dynamics
+============================================================================================
+The equations describing the Hodgkin-Huxley models of the various voltage-gated channels are
+in the script:
+                              gnrh_chansave.g
+These should not need to be changed, but if new information (such as from Voltage-clamp
+experiments) become available, this is where the model will need to be changed.
+
+==================================================================================
+			Running Without MATLAB
+===================================================================================
+It is not necessary to use the MATLAB shell to run the simulations.  What the Genesis 
+scripts do is to output simulation results into ASCII files, stored in the "output"
+subdirectory.  The data files are:
+
+                    Vm_traces.asc -------- First column seconds, second column Volts
+                    Current_traces.asc------First column seconds, second column Amperes
+                    gsyn_AMPA_traces.asc  ------ First column seconds, Following columns
+                                                 (one for each AMPA synapse) Siemens
+                    gsyn_GABA_traces.asc  ------ First column seconds, Following columns
+                                                 (one for each GABA synapse) Siemens
+The simulations can be run from a shell command line with the syntax:
+                   genesis gnrh_runcell_GABA_singlecomp
+                                or
+                   genesis gnrh_runcell_GABA
+The files in the output subdirectory can then be analyzed with any plotting program.
